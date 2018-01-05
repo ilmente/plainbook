@@ -1,0 +1,23 @@
+{
+  "name": "plainbook",
+  "version": "0.0.1",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "./node_modules/typescript/bin/tsc",
+    "watch": "./node_modules/typescript/bin/tsc --watch",
+    "serve": "node ./dist"
+  },
+  "author": "Alessandro Bellini - ilmente",
+  "license": "MIT",
+  "dependencies": {
+    "@types/express": "^4.11.0",
+    "@types/node": "^8.5.2",
+    "express": "^4.16.2",
+    "gray-matter": "^3.1.1",
+    "marked": "^0.3.9",
+    "micro": "^9.0.2",
+    "ramda": "^0.25.0",
+    "typescript": "^2.6.2"
+  }
+}
