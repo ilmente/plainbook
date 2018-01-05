@@ -53,9 +53,10 @@ async function crawl(directories: string[], files: string[]): Promise<string[]> 
     }
 
     const paths = flatten(await scanDirectories(directories));
-    directories = filterDirectories(paths);
-    files = concat(files, filterFiles(paths));
-    return crawl(directories, files);
+    return crawl(
+        filterDirectories(paths),
+        concat(files, filterFiles(paths))
+    );
 }
 
 async function readAbstractDocuments(paths: string[]): Promise<IAbstractDocument[]> {
