@@ -25,7 +25,7 @@ class Server {
     mountContentRoutes(map) {
         return __awaiter(this, void 0, void 0, function* () {
             const abstracts = Array.from(map.values());
-            return Promise.all(abstracts.map((abstract) => __awaiter(this, void 0, void 0, function* () { return this.setContentHandler(map, abstract); })));
+            return Promise.all(abstracts.map((abstract) => this.setContentHandler(map, abstract)));
         });
     }
     mountStaticRoutes() {
@@ -45,7 +45,7 @@ class Server {
             const document = yield this.content.getDocument(abstract.path);
             const View = view_1.get(document.meta.view);
             const view = new View(this.config, map, document);
-            this.app.get(document.slug, (request, reply) => __awaiter(this, void 0, void 0, function* () { return view.handler(request, reply); }));
+            this.app.get(document.slug, (request, reply) => view.handler(request, reply));
         });
     }
     setStaticHandler(route) {
@@ -64,9 +64,9 @@ class Server {
     setup() {
         return __awaiter(this, void 0, void 0, function* () {
             return this.loadAbstractMap()
-                .then((map) => __awaiter(this, void 0, void 0, function* () { return this.mountContentRoutes(map); }))
-                .then(() => __awaiter(this, void 0, void 0, function* () { return this.mountStaticRoutes(); }))
-                .then(() => __awaiter(this, void 0, void 0, function* () { return this.mountServiceRoutes(); }));
+                .then((map) => this.mountContentRoutes(map))
+                .then(() => this.mountStaticRoutes())
+                .then(() => this.mountServiceRoutes());
         });
     }
     listen() {
