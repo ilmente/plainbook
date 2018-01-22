@@ -11,21 +11,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = require("fs");
 const util_1 = require("util");
 const path_1 = require("path");
+const ramda_1 = require("ramda");
 const fsReadFile = util_1.promisify(fs_1.readFile);
 class Content {
     constructor(config, crawler, parser) {
         this.config = config;
         this.crawler = crawler;
         this.parser = parser;
+        this.slugSearchValues = this.getSlugSearchValues();
+    }
+    getSlugSearchValues() {
+        const extensionsExpression = this.crawler.allowedExtensions
+            .map((extension) => `\\${extension}`)
+            .join('|');
+        return [
+            this.config.path.content,
+            new RegExp(/\/index/, 'gi'),
+            new RegExp(`(${extensionsExpression})$`, 'gi')
+        ];
     }
     getSlug(fullPath) {
-        const condition = this.crawler.allowedExtensions.map((ext) => `\\${ext}`).join('|');
-        const regexp = new RegExp(`(${condition})$`);
-        const slug = fullPath
-            .replace(this.config.path.content, '')
-            .replace('/index', '')
-            .replace(regexp, '');
-        return slug || '/';
+        const reducer = (slug, searchValue) => slug.replace(searchValue, '');
+        return ramda_1.reduce(reducer, fullPath, this.slugSearchValues) || '/';
     }
     getAbstracts(paths) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -33,7 +40,8 @@ class Content {
         });
     }
     createAbstractMap(abstracts) {
-        return abstracts.reduce((map, abstract) => map.set(abstract.slug, abstract), new Map());
+        const reducer = (map, abstract) => map.set(abstract.slug, abstract);
+        return abstracts.reduce(reducer, new Map());
     }
     getAbstractMap() {
         return __awaiter(this, void 0, void 0, function* () {

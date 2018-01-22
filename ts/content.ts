@@ -1,6 +1,7 @@
 import { readFile } from 'fs';
 import { promisify } from 'util';
 import { extname } from 'path';
+import { reduce } from 'ramda';
 import { Crawler } from './crawler';
 import { Parser, File } from './parser';
 import { Config } from './config';
@@ -25,22 +26,30 @@ export class Content {
     protected readonly config: Config
     protected readonly crawler: Crawler
     protected readonly parser: Parser
+    protected readonly slugSearchValues: (string | RegExp)[]
 
     constructor(config: Config, crawler: Crawler, parser: Parser) { 
         this.config = config;
         this.crawler = crawler;
         this.parser = parser;
+        this.slugSearchValues = this.getSlugSearchValues();
+    }
+
+    protected getSlugSearchValues(): (string | RegExp)[] { 
+        const extensionsExpression = this.crawler.allowedExtensions
+            .map((extension: string) => `\\${extension}`)
+            .join('|');
+
+        return [
+            this.config.path.content,
+            new RegExp(/\/index/, 'gi'),
+            new RegExp(`(${extensionsExpression})$`, 'gi')
+        ];
     }
 
     protected getSlug(fullPath: string): string {
-        const condition = this.crawler.allowedExtensions.map((ext: string) => `\\${ext}`).join('|');
-        const regexp = new RegExp(`(${condition})$`);
-        const slug = fullPath
-            .replace(this.config.path.content, '')
-            .replace('/index', '')
-            .replace(regexp, '');
-
-        return slug || '/';
+        const reducer = (slug: string, searchValue: string) => slug.replace(searchValue, '');
+        return reduce(reducer, fullPath, this.slugSearchValues) || '/';
     }
 
     protected async getAbstracts(paths: string[]): Promise<Abstract[]> {
@@ -48,10 +57,8 @@ export class Content {
     }
 
     protected createAbstractMap(abstracts: Abstract[]): AbstractMap {
-        return abstracts.reduce(
-            (map: AbstractMap, abstract: Abstract) => map.set(abstract.slug, abstract),
-            new Map<string, Abstract>()
-        );
+        const reducer = (map: AbstractMap, abstract: Abstract) => map.set(abstract.slug, abstract);
+        return abstracts.reduce(reducer, new Map<string, Abstract>());
     }
 
     async getAbstractMap(): Promise<AbstractMap> {
