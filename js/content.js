@@ -33,15 +33,13 @@ class Content {
         });
     }
     createAbstractMap(abstracts) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return abstracts.reduce((map, abstract) => map.set(abstract.slug, abstract), new Map());
-        });
+        return abstracts.reduce((map, abstract) => map.set(abstract.slug, abstract), new Map());
     }
     getAbstractMap() {
         return __awaiter(this, void 0, void 0, function* () {
             return this.crawler.crawl(this.config.path.content)
-                .then((files) => __awaiter(this, void 0, void 0, function* () { return this.getAbstracts(files); }))
-                .then((abstracts) => __awaiter(this, void 0, void 0, function* () { return this.createAbstractMap(abstracts); }));
+                .then((files) => this.getAbstracts(files))
+                .then((abstracts) => this.createAbstractMap(abstracts));
         });
     }
     getAbstract(path) {

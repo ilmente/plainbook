@@ -26,7 +26,7 @@ export class Content {
     protected readonly crawler: Crawler
     protected readonly parser: Parser
 
-    constructor(config: Config, crawler: Crawler, parser: Parser,) { 
+    constructor(config: Config, crawler: Crawler, parser: Parser) { 
         this.config = config;
         this.crawler = crawler;
         this.parser = parser;
@@ -47,7 +47,7 @@ export class Content {
         return Promise.all(paths.map((path: string) => this.getAbstract.call(this, path)));
     }
 
-    protected async createAbstractMap(abstracts: Abstract[]): Promise<AbstractMap> {
+    protected createAbstractMap(abstracts: Abstract[]): AbstractMap {
         return abstracts.reduce(
             (map: AbstractMap, abstract: Abstract) => map.set(abstract.slug, abstract),
             new Map<string, Abstract>()
@@ -56,8 +56,8 @@ export class Content {
 
     async getAbstractMap(): Promise<AbstractMap> {
         return this.crawler.crawl(this.config.path.content)
-            .then(async (files: string[]) => this.getAbstracts(files))
-            .then(async (abstracts: Abstract[]) => this.createAbstractMap(abstracts))
+            .then((files: string[]) => this.getAbstracts(files))
+            .then((abstracts: Abstract[]) => this.createAbstractMap(abstracts))
     }
 
     async getAbstract(path: string): Promise<Abstract> {
