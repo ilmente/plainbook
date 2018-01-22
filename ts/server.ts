@@ -5,7 +5,7 @@ import { Content, Abstract, AbstractMap } from './content';
 import { get as getView, getNotFound as getNotFoundView, getError as getErrorView } from './view';
 import { Config } from './config';
 
-export type ServerConstructor = new (AbstractMap) => Server
+export type ServerConstructor = new (AbstractMap, Content) => Server
 export type ServerApplication = fastify.FastifyInstance<HttpServer, IncomingMessage, ServerResponse>
 export type ServerRequest = fastify.FastifyRequest<IncomingMessage>
 export type ServerReply = fastify.FastifyReply<ServerResponse>
@@ -27,7 +27,7 @@ export class Server {
 
     protected async mountContentRoutes(map: AbstractMap): Promise<void[]> {
         const abstracts = Array.from(map.values());
-        return Promise.all(abstracts.map(async (abstract: Abstract) => this.setContentHandler(map, abstract)));
+        return Promise.all(abstracts.map((abstract: Abstract) => this.setContentHandler(map, abstract)));
     }
 
     protected async mountStaticRoutes(): Promise<void> {
@@ -44,7 +44,7 @@ export class Server {
         const document = await this.content.getDocument(abstract.path);
         const View = getView(document.meta.view);
         const view = new View(this.config, map, document);
-        this.app.get(document.slug, async (request: ServerRequest, reply: ServerReply) => view.handler(request, reply));
+        this.app.get(document.slug, (request: ServerRequest, reply: ServerReply) => view.handler(request, reply));
     }
 
     protected setStaticHandler(route: string): void {
@@ -65,9 +65,9 @@ export class Server {
 
     async setup(): Promise<void> {
         return this.loadAbstractMap()
-            .then(async (map: AbstractMap) => this.mountContentRoutes(map))
-            .then(async () => this.mountStaticRoutes())
-            .then(async () => this.mountServiceRoutes());
+            .then((map: AbstractMap) => this.mountContentRoutes(map))
+            .then(() => this.mountStaticRoutes())
+            .then(() => this.mountServiceRoutes());
     }
 
     async listen(): Promise<HttpServer> {

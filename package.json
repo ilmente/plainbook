@@ -1,6 +1,6 @@
 {
   "name": "plainbook",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The dumbest CMS ever",
   "main": "js/index.js",
   "scripts": {
@@ -19,12 +19,14 @@
     "url": "https://github.com/ilmente/plainbook.git"
   },
   "dependencies": {
-    "@types/node": "^8.5.2",
     "fastify": "^0.39.1",
     "gray-matter": "^3.1.1",
     "marked": "^0.3.9",
     "ramda": "^0.25.0",
-    "serve-static": "^1.13.1",
+    "serve-static": "^1.13.1"
+  },
+  "devDependencies": {
+    "@types/node": "^8.5.2",
     "typescript": "^2.6.2"
   }
 }
